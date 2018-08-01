@@ -1,7 +1,9 @@
 <template>
     <div>
       <nav-header></nav-header>
-      <nav-bread></nav-bread>
+      <nav-bread>
+        <span>Goods</span>
+      </nav-bread>
       <div class="accessory-result-page accessory-page">
         <div class="container">
           <div class="filter-nav">
