@@ -9,7 +9,15 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
-
+//后台模拟数据第一步
+const express = require('express');
+const app = express();
+const router = express.Router();
+const data = require('./../mock/goods')
+router.get("/goods",function (req,res,next) {
+  res.json(data);
+});
+app.use(router);
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
