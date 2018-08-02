@@ -10,14 +10,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 //后台模拟数据第一步
-const express = require('express');
-const app = express();
-const router = express.Router();
+const express = require('express')
+//请求server
+const app = express()
+const router = express.Router()
+//加载本地数据
 const data = require('./../mock/goods')
-router.get("/goods",function (req,res,next) {
-  res.json(data);
-});
-app.use(router);
+//通过路由请求数据
+app.use('/goods',router)
+
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
@@ -30,6 +31,15 @@ const devWebpackConfig = merge(baseWebpackConfig, {
 
   // these devServer options should be customized in /config/index.js
   devServer: {
+    before(app){
+      app.get('/goods',(req,res,next)=>{
+        res.json({
+          data:data,
+          msg:'',
+          status:0
+        })
+      })
+    },
     clientLogLevel: 'warning',
     historyApiFallback: {
       rewrites: [
