@@ -31,7 +31,7 @@
                 <ul>
                   <li v-for="(item,index) in goodsList">
                     <div class="pic">
-                      <a href="#"><img v-lazy="'static/img/'+item.productImg" alt=""></a>
+                      <a href="#"><img v-lazy="'static/img/'+item.productImage" alt=""></a>
                     </div>
                     <div class="main">
                       <div class="name">{{item.productName}}</div>
@@ -98,9 +98,11 @@
       },
       methods:{
           getGoodsList(){
-            axios.get("/goods").then((result)=>{
-              let res = result.data;
-              this.goodsList = res.data.result;
+            axios.get("/goods").then((res)=>{
+              if(res.data.status == '0'){
+                this.goodsList = res.data.result.doc;
+              }
+
             });
           },
         showFilterPop(){
