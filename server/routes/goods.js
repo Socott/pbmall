@@ -20,18 +20,34 @@ mongoose.connection.on("disconnected",()=>{
 });
 
 //查询商品（二级路由）
-router.get("/",(req,res,nex)=>{
+router.get("/",(req,res,next)=>{
+  //获取参数
   let page = req.param('page');
   let pageSize = req.param('pageSize');
-  let skip = (page-1)*pageSize
-
-  //获取排序参数
-  var sort = req.param('sort');
+  let sort = req.param('sort');
+  let skip = (page-1)*pageSize;
+  let priceLevel = req.param('priceLevel');
+  let priceGt = '',priceLte = '';
   let params = {};
+  if(priceLevel != 'all'){
+    switch (priceLevel) {
+      case '0': priceGt = 0; priceLte = 100;break;
+      case '1': priceGt = 100; priceLte = 500;break;
+      case '2': priceGt = 500; priceLte = 1000;break;
+      case '3': priceGt = 1000; priceLte = 2000;break;
+    }
+    params = {
+      salePrice:{
+        $gt:priceGt,
+        $lte:priceLte
+      }
+    };
+  console.log(params);
+  }
   let goodsModel = Goods.find(params).skip(skip).limit(pageSize);
   goodsModel.sort({'salePrice':sort});
   //查询数据库
-  Goods.exec((err,doc)=>{
+  goodsModel.exec((err,doc)=>{
     if(err){
       res.json({
         status:'1',
