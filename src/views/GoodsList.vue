@@ -37,7 +37,7 @@
                       <div class="name">{{item.productName}}</div>
                       <div class="price">{{item.salePrice}}</div>
                       <div class="btn-area">
-                        <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                        <a href="javascript:;" @click="addCart(item.productId)" class="btn btn--m">加入购物车</a>
                       </div>
                     </div>
                   </li>
@@ -107,7 +107,7 @@
       },
       methods:{
           getGoodsList(flag){
-            //参数
+            /**参数*/
             let param = {
               page:this.page,
               pageSize:this.pageSize,
@@ -146,7 +146,7 @@
           this.filterBy = false;
           this.overLayFlag=false;
         },
-        //价格过滤
+        /**价格过滤*/
         setPriceFilter(index){
             this.page = 1;
             this.priceChecked = index;
@@ -154,20 +154,26 @@
             this.filterBy=false;
             this.getGoodsList();
         },
-        //排序
+        /**排序*/
         sortGoods(){
             this.sortFlag = !this.sortFlag;
             this.sortup = !this.sortup;
             this.page = 1;
             this.getGoodsList();
         },
-        //向下滚动时
+        /**向下滚动时*/
         loadMore(){
           this.busy = true;
             setTimeout(() => {
               this.page++;
               this.getGoodsList(true);
             }, 500);
+        },
+        /**加入购物车*/
+          addCart(productId){
+              axios.post('/users/addCart',{productId}).then((res)=>{
+
+              });
         }
       }
     }
