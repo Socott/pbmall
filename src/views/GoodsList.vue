@@ -42,7 +42,7 @@
                     </div>
                   </li>
                 </ul>
-                <div v-show="loading" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="0" class="load-more">
+                <div v-show="loading" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="30" class="load-more">
                   加载中...
                 </div>
               </div>
@@ -82,7 +82,7 @@
               },
               {
                 startPrice:'1000.00',
-                endPrice:'2000.00'
+                endPrice:'5000.00'
               },
             ],
             priceChecked:'all',
@@ -119,14 +119,21 @@
             }).then((res)=>{
               if(res.data.status == '0'){
                 if(flag){
-                  this.goodsList = this.goodsList.concat(res.data.result.doc);console.log(this.busy);
-                  if(res.data.result.count <= this.pageSize){
-                    this.busy = false;
+                  this.goodsList = this.goodsList.concat(res.data.result.doc);console.log(res.data.result.count);
+                  if(res.data.result.count < this.pageSize){
+                    this.busy = true;
                     this.loading = false;
+                  }else{
+                      this.busy = false;
                   }
                 }else{
-                  this.busy = false;
                   this.goodsList = res.data.result.doc;
+                    if(res.data.result.count < this.pageSize){
+                        this.busy = true;
+                        this.loading = false;
+                    }else{
+                        this.busy = false;
+                    }
                 }
               }
             });
@@ -141,6 +148,7 @@
         },
         //价格过滤
         setPriceFilter(index){
+            this.page = 1;
             this.priceChecked = index;
             this.overLayFlag=false;
             this.filterBy=false;
@@ -159,7 +167,6 @@
             setTimeout(() => {
               this.page++;
               this.getGoodsList(true);
-              this.busy = false;
             }, 500);
         }
       }

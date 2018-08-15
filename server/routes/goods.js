@@ -22,10 +22,10 @@ mongoose.connection.on("disconnected",()=>{
 //查询商品（二级路由）
 router.get("/",(req,res,next)=>{
   //获取参数
-  let page = req.param('page');
-  let pageSize = req.param('pageSize');
-  let sort = req.param('sort');
-  let skip = (page-1)*pageSize;
+  let page = parseInt(req.param('page'));
+  let pageSize = parseInt(req.param('pageSize'));
+  let sort = parseInt(req.param('sort'));
+  let skip = parseInt((page-1)*pageSize);
   let priceLevel = req.param('priceLevel');
   let priceGt = '',priceLte = '';
   let params = {};
@@ -34,7 +34,7 @@ router.get("/",(req,res,next)=>{
       case '0': priceGt = 0; priceLte = 100;break;
       case '1': priceGt = 100; priceLte = 500;break;
       case '2': priceGt = 500; priceLte = 1000;break;
-      case '3': priceGt = 1000; priceLte = 2000;break;
+      case '3': priceGt = 1000; priceLte = 5000;break;
     }
     params = {
       salePrice:{
