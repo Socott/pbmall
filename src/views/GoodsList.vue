@@ -43,7 +43,7 @@
                   </li>
                 </ul>
                 <div v-show="loading" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="30" class="load-more">
-                  加载中...
+                  <img src="../assets/loading-spinning-bubbles.svg" alt="">
                 </div>
               </div>
             </div>
@@ -171,8 +171,12 @@
         },
         /**加入购物车*/
           addCart(productId){
-              axios.post('/users/addCart',{productId}).then((res)=>{
-
+              axios.post('/goods/addCart',{productId:productId}).then((res)=>{
+                  if(res.data.status == '0'){
+                    alert('加入购物车成功！');
+                  }else{
+                    alert(`msg: ${res.data.msg}`);
+                  }
               });
         }
       }
