@@ -21,11 +21,11 @@ mongoose.connection.on("disconnected",()=>{
 });
 
 //查询商品（二级路由）
-router.get("/",(req,res,next)=>{
+router.get("/list",(req,res,next)=>{
   //获取参数
   let page = parseInt(req.query.page);
   let pageSize = parseInt(req.query.pageSize);
-  let sort = parseInt(pageSize.sort);
+  let sort = parseInt(req.query.sort);
   let skip = parseInt((page-1)*pageSize);
   let priceLevel = req.query.priceLevel;
   let priceGt = '',priceLte = '';

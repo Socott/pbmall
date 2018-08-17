@@ -50,7 +50,14 @@
           </div>
         </div>
       </div>
-      <div class="md-overlay" v-show="overLayFlag" @click="closePop"></div>
+      <model v-bind:mdShow="mdShow" v-on:close="closeModel()">
+        <p slot="message">
+          请先登录，否则无法加入购物车
+        </p>
+        <div slot="btnGroup">
+          <a class="btn btn--m" href="javascript:(0);" @click="mdShow = false">关闭</a>
+        </div>
+      </model>
       <nav-footer></nav-footer>
     </div>
 </template>
@@ -62,6 +69,7 @@
   import NavHeader from './../components/NavHeader'
   import NavFooter from './../components/NavFooter'
   import NavBread from './../components/NavBread'
+  import Model from './../components/Models'
   import axios from 'axios'
     export default {
         data(){
@@ -93,14 +101,16 @@
             pageSize:8,
             busy:true,
             sortup:true,
-            loading:true
+            loading:true,
+            mdShow:false
           }
         },
         name: "GoodsList",
         components:{
           NavHeader,
           NavFooter,
-          NavBread
+          NavBread,
+          Model
         },
       mounted:function () {
         this.getGoodsList();
@@ -114,7 +124,7 @@
               sort:this.sortFlag ? 1 : -1,
               priceLevel:this.priceChecked
             };
-            axios.get("/goods",{
+            axios.get("/goods/list",{
               params:param
             }).then((res)=>{
               if(res.data.status == '0'){
@@ -175,9 +185,13 @@
                   if(res.data.status == '0'){
                     alert('加入购物车成功！');
                   }else{
-                    alert(`msg: ${res.data.msg}`);
+                    this.mdShow = true;
                   }
               });
+        },
+        /**关闭模态框*/
+        closeModel(){
+          this.mdShow = false;
         }
       }
     }
