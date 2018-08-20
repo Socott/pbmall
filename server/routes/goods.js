@@ -71,7 +71,7 @@ router.post("/addCart",(req,res,next)=>{
   //获取商品参数
   var productId = req.body.productId;
   //假设用户已经登录，且userId=100000077
-  var userId = 100000077;
+  var userId = req.cookies.userId;
   //根据id查找出用户信息
   Users.findOne({userId:userId},(err,userDoc)=>{
     if(err){
@@ -99,7 +99,7 @@ router.post("/addCart",(req,res,next)=>{
               }
               if(flag){
                 doc._doc.productNum = 1;
-                doc._doc.checked = 0;
+                doc._doc.checked = 1;
                 userDoc.cartList.push(doc);
               }
                 userDoc.save((err3,doc3)=>{

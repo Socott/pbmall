@@ -50,12 +50,24 @@
           </div>
         </div>
       </div>
-      <model v-bind:mdShow="mdShow" v-on:close="closeModel()">
+      <model v-bind:mdShow="mdShow" v-on:close="closeModel">
         <p slot="message">
           请先登录，否则无法加入购物车
         </p>
         <div slot="btnGroup">
           <a class="btn btn--m" href="javascript:(0);" @click="mdShow = false">关闭</a>
+        </div>
+      </model>
+      <model v-bind:mdShow="mdShowCart" v-on:close="closeModel">
+        <p slot="message">
+          <svg class="navbar-cart-logo">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-cart"></use>
+          </svg>
+          <span>加入购物车成功！</span>
+        </p>
+        <div slot="btnGroup">
+          <a class="btn btn--m" href="javascript:(0);" @click="mdShowCart = false">继续购物</a>
+          <router-link class="btn btn--m" href="javascript:(0);" to="/cart">查看购物车</router-link>
         </div>
       </model>
       <nav-footer></nav-footer>
@@ -102,7 +114,8 @@
             busy:true,
             sortup:true,
             loading:true,
-            mdShow:false
+            mdShow:false,
+            mdShowCart:false
           }
         },
         name: "GoodsList",
@@ -183,7 +196,7 @@
           addCart(productId){
               axios.post('/goods/addCart',{productId:productId}).then((res)=>{
                   if(res.data.status == '0'){
-                    alert('加入购物车成功！');
+                    this.mdShowCart = true;
                   }else{
                     this.mdShow = true;
                   }
@@ -192,6 +205,7 @@
         /**关闭模态框*/
         closeModel(){
           this.mdShow = false;
+          this.mdShowCart = false;
         }
       }
     }

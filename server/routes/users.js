@@ -82,5 +82,30 @@ router.get('/checkLogin',(req,res,next)=>{
       result:''
     });
   }
-})
+});
+
+//查询当前用户信息
+router.get("/cartList",(req,res,next)=>{
+var userId = req.cookies.userId;
+  Users.findOne({userId},(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message
+      });
+    }else {
+      res.json({
+        status:'0',
+        msg:'',
+        result:{
+          count:doc.length,
+          doc:doc
+        }
+      })
+
+    }
+  })
+});
+
+
 module.exports = router;
