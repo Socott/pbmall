@@ -88,11 +88,11 @@ router.get('/checkLogin',(req,res,next)=>{
 router.get("/cartList",(req,res,next)=>{
 var userId = req.cookies.userId;
   Users.findOne({userId},(err,doc)=>{
-    if(err){
-      res.json({
-        status:'1',
-        msg:err.message
-      });
+        if(err){
+          res.json({
+            status:'1',
+            msg:err.message
+          });
     }else {
       res.json({
         status:'0',
@@ -107,5 +107,97 @@ var userId = req.cookies.userId;
   })
 });
 
+//购物车商品删除
+router.post("/cart/del",(req,res,next)=>{
+  let userId = req.cookies.userId;
+  let productId = req.body.productId;
+  Users.update({
+    userId
+  },{
+    $pull:{
+      'cartList':{
+        'productId':productId
+      }
+    }
+  },(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message
+      });
+    }else {
+      res.json({
+        status:'0',
+        msg:'',
+        result:'suc'
+      })
+    }
+  });
+
+});
+
+//购物车数量修改
+router.post('/cartEdit',(req,res,next)=>{
+  let userId = req.cookies.userId,
+    productId = req.body.productId,
+    checked = req.body.checked?'1':'0',
+    productNum = req.body.productNum;
+  console.log(userId,productId,productNum,checked);
+  Users.update({
+    "userId":userId,
+    "cartList.productId":productId
+  },{
+    "cartList.$.productNum":productNum,
+    "cartList.$.checked":checked,
+  },(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message
+      });
+    }else {
+      res.json({
+        status:'0',
+        msg:'',
+        result:'suc'
+      })
+    }
+  })
+});
+
+//购物车全选
+router.post('/editCheckedAll',(req,res,next)=>{
+  let userId = req.cookies.userId,
+    checkedAllFlage = req.body.checkedAllFlage?'1':'0';
+  console.log(req.body.checkedAllFlage);
+  Users.findOne({
+    "userId":userId
+  },(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message
+      });
+    }else {
+      doc.cartList.forEach((product)=>{
+        product.checked = checkedAllFlage;
+      });
+      doc.save((err,doc2)=>{
+        if(err){
+          res.json({
+            status:'1',
+            msg:err.message
+          });
+        }else {
+          res.json({
+            status:'0',
+            msg:'',
+            result:'suc'
+          })
+        }
+      })
+    }
+  })
+});
 
 module.exports = router;
