@@ -86,7 +86,7 @@
                   Item total: <span class="total-price">{{totalPrice | currency('$')}}</span>
                 </div>
                 <div class="btn-wrap">
-                  <a class="btn btn--red">Checkout</a>
+                  <a class="btn btn--red" v-bind:class="{'btn--dis':checkedCount==0}" @click="Checkout">Checkout</a>
                 </div>
               </div>
             </div>
@@ -157,7 +157,7 @@
       },
       methods:{
         getCartList(){
-            axios('/users/cartList').then((res)=>{
+            axios.get('/users/cartList').then((res)=>{
               if(res.data.status == '0'){
                   this.cartList = res.data.result.doc.cartList
               }
@@ -222,6 +222,14 @@
               alert(res.data.msg);
             }
           });
+        },
+        /**跳转到地址页面*/
+        Checkout(){
+          if(this.checkedCount > 0){
+            this.$router.push({
+              path:'address'
+            })
+          }
         }
       }
     }

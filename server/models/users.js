@@ -16,7 +16,16 @@ var UserSchema = new mongoose.Schema({
             "checked":String
         }
     ],
-    "addressList":Array
+    "addressList":[
+      {
+        "addressId": String,
+        "userName": String,
+        "streetName": String,
+        "postCode": Number,
+        "tel": String,
+        "isDefault": Boolean
+      }
+    ]
 });
 
 module.exports = mongoose.model('dumall-user',UserSchema);

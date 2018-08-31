@@ -200,4 +200,143 @@ router.post('/editCheckedAll',(req,res,next)=>{
   })
 });
 
+//查询地址
+router.get('/adressList',(req,res,next)=>{
+  let userId = req.cookies.userId;
+  Users.findOne({userId},(err,doc)=>{
+    if(err){
+      res.json({
+        status:"1",
+        msg:err.message,
+        result:''
+      })
+    }else {
+      doc.addressList = doc.addressList.sort(doc.addressList.isDefault )
+      res.json({
+        status:"0",
+        msg:'',
+        result:doc.addressList
+      })
+
+    }
+  })
+});
+
+//设置默认地址
+router.post('/setDefault',(req,res,next)=>{
+  let userId = req.cookies.userId,
+    addressId = req.body.addressId;
+    Users.findOne({
+      userId:userId
+    },(err,doc)=>{
+      if(err){
+        res.json({
+          status:"1",
+          msg:err.message,
+          result:''
+        })
+      }else{
+        doc.addressList.forEach((item)=>{
+          if(item.addressId == addressId){
+            item.isDefault = true;
+          }else{
+            item.isDefault = false;
+          }
+        });
+        doc.save((err1,doc1)=>{
+          if(err){
+            res.json({
+              status:"1",
+              msg:err1.message,
+              result:''
+            })
+          }else{
+            res.json({
+              status:"0",
+              msg:'',
+              result:doc.addressList
+            })
+          }
+        });
+      }
+    })
+});
+
+//删除地址功能
+router.post("/address/del",(req,res,next)=>{
+  let userId = req.cookies.userId,
+    addressId = req.body.addressId;
+  Users.update({
+    userId:userId
+  },{
+    $pull:{
+      'addressList':{
+        'addressId':addressId
+      }
+    }
+  },(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message,
+        result:''
+      })
+    }else{
+      res.json({
+        status:'0',
+        msg:'suc',
+        result:''
+      })
+    }
+  })
+
+});
+
+//添加地址功能
+router.post("/address/add",(req,res,next)=>{
+  let userId = req.cookies.userId,
+      addressDoc = {};
+      userName = req.body.params.userName,
+      streetName = req.body.params.streetName,
+      postCode = parseInt(req.body.params.postCode),
+      tel = req.body.params.tel;
+      Users.findOne({
+        userId:userId
+      },(err,doc)=>{
+        if(err){
+          res.json({
+            status:'1',
+            msg:err.message,
+            result:''
+          })
+        }else{
+          addressDoc={
+            userName:userName,
+            streetName:streetName,
+            postCode:postCode,
+            tel:tel,
+            isDefault:false
+          };
+          console.log(addressDoc);
+          doc.addressList.push(addressDoc);
+          doc.save((err2,doc2)=>{
+            if(err2){
+              res.json({
+                status:'1',
+                msg:err2.message,
+                result:''
+              })
+            }else{
+              console.log(doc2);
+              res.json({
+                status:'0',
+                msg:'suc',
+                result:doc.addressList
+              })
+            }
+          })
+        }
+      });
+})
+
 module.exports = router;
