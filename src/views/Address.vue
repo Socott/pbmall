@@ -60,7 +60,7 @@
             <div class="addr-list-wrap">
               <div class="addr-list">
                 <ul>
-                  <li v-for="(item,index) in addressListFilter" v-bind:class="{'check':checkedIndex==index}" @click="checkedIndex = index">
+                  <li v-for="(item,index) in addressListFilter" v-bind:class="{'check':checkedIndex==index}" @click="checkedAddress(item.addressId),checkedIndex = index">
                     <dl>
                       <dt>{{item.userName}}</dt>
                       <dd class="address">{{item.streetName}}</dd>
@@ -119,7 +119,7 @@
               </div>
             </div>
             <div class="next-btn-wrap">
-              <a class="btn btn--m btn--red">Next</a>
+              <a class="btn btn--m btn--red" @click="orderConfirm">Next</a>
             </div>
           </div>
         </div>
@@ -187,7 +187,8 @@
             postCode:'',
             tel:'',
             errMsg:'',
-            errorTip:false
+            errorTip:false,
+            checkedAddressId:''
           }
         },
         components:{
@@ -277,6 +278,21 @@
                 this.errorTip = true;
                 this.errMsg = res.data.msg;return;
               }
+            })
+          }
+        },
+        /**标记选择地址的id*/
+        checkedAddress(addressId){
+            this.checkedAddressId = addressId;
+        },
+        /**点击下一步订单确认*/
+        orderConfirm(){
+          //1.获取选中的地址
+          let addressId = this.checkedAddressId ? this.checkedAddressId : this.addressList[0]['addressId'];
+          if(addressId){
+            this.$router.push({
+              path:"order/confirm",
+              query:{addressId:addressId}
             })
           }
         }

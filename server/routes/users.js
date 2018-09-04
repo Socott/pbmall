@@ -1,6 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var Users = require('./../models/users');
+let express = require('express');
+let router = express.Router();
+let Users = require('./../models/users');
+let util = require('./../util/util');
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
@@ -70,6 +72,14 @@ router.post("/logout",(req,res,next)=> {
 //检验是否已经登录
 router.get('/checkLogin',(req,res,next)=>{
   if(req.cookies.userId){
+    res.cookie('userName',req.cookies.userName,{
+      path:'/',
+      maxAge:1000*60*60
+    });
+    res.cookie('userId',req.cookies.userId,{
+      path:'/',
+      maxAge:1000*60*60
+    });
     res.json({
       status:'0',
       msg:'',
@@ -142,7 +152,6 @@ router.post('/cartEdit',(req,res,next)=>{
     productId = req.body.productId,
     checked = req.body.checked?'1':'0',
     productNum = req.body.productNum;
-  console.log(userId,productId,productNum,checked);
   Users.update({
     "userId":userId,
     "cartList.productId":productId
@@ -337,6 +346,109 @@ router.post("/address/add",(req,res,next)=>{
           })
         }
       });
-})
+});
+
+//生成用户订单
+router.post("/payMent",(req,res,next)=>{
+  let userId = req.cookies.userId,
+    addressId = req.body.addressId,
+    orderTotal = req.body.orderTotal;
+  Users.findOne({
+    userId:userId
+  },(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message,
+        result:''
+      })
+    }else{
+      let address = '',goodsList = [];
+      doc.addressList.forEach((item)=>{
+        //获取当前用户地址信息
+          if(item.addressId == addressId){
+            address = item;
+          }
+      });
+      //获取用户购物车商品
+      doc.cartList.filter((item)=>{
+        if(item.checked == '1'){
+          goodsList = item;
+          doc.cartList.remove(item);
+        }
+      });
+
+      //随机数
+      let platform = '622';//平台号
+      let r1 = Math.floor(Math.random()*10);//0~10随机数
+      let r2 = Math.floor(Math.random()*10);//0~10随机数
+
+      let sysDate = new Date().Format('yyyyMMddhhmmss');
+      let createDate = new Date().Format('yyyy-MM-dd hh:mm:ss');
+
+      let orderId = platform+r1+sysDate+r2;
+      let order = {
+        orderId:orderId,
+        orderTotal:orderTotal,
+        addressInfo:address,
+        goodsList:goodsList,
+        orderStatus:'1',
+        createDate:createDate
+      }
+
+      doc.orderList.push(order);
+      doc.save((err1,doc1)=>{
+        if(err1){
+          res.json({
+            status:'1',
+            msg:err1.message,
+            result:''
+          })
+        }else{
+          res.json({
+            status:'0',
+            msg:'',
+            result:{
+              orderId:order.orderId,
+              orderTotal:order.orderTotal
+            }
+          })
+        }
+      });
+    }
+  })
+});
+
+//查询订单详情
+router.post('/orderDetail',(req,res,next)=>{
+  let userId = req.cookies.userId,
+    orderId = req.body.orderId;
+  Users.findOne({
+    userId:userId
+  },(err,doc)=>{
+    if(err){
+      res.json({
+        status:'1',
+        msg:err.message,
+        result:''
+      })
+    }else{
+      let orderDetail = '';
+      doc.orderList.forEach((item)=>{
+        if(item.orderId == orderId){
+          orderDetail = item;
+        }
+      })
+      if(orderDetail){
+        res.json({
+          status:'0',
+          msg:'',
+          result:orderDetail
+        })
+      }
+
+    }
+  })
+});
 
 module.exports = router;
